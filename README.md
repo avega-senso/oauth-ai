@@ -42,4 +42,4 @@ This project was inspired by the intersection of OAuth and AI technologies. We w
 
 ## Contact
 
-For any inquiries or further information about OAuth-AI, please contact our team at oauth-ai@example.com.
+For any inquiries or further information about OAuth-AI, please contact our team at oauth-ai@avega.se.
