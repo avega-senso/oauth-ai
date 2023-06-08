@@ -1,20 +1,28 @@
-# OAuth-AI
+# OAuth2.0 Google Authentication Project
 
-# Flask JWT Validation Service
+This project is designed to provide a secure login and authorization process using OAuth 2.0 and OpenID Connect protocols with Google as the identity provider.
 
-This project provides a simple Flask-based service to validate JWT tokens. 
+## Table of Contents
+1. [Overview](#overview)
+2. [Project Structure](#project-structure)
+3. [Setup and Installation](#setup-and-installation)
+4. [Usage](#usage)
+5. [Contribute](#contribute)
+6. [License](#license)
 
-## Getting Started
+## Overview
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+This project includes the development of a Web Frontend, an Authorization Server, and a Resource Server. The Web Frontend initiates the login process by redirecting users to Google. The Authorization Server receives an ID-token from Google via the Web Frontend, verifies the token, and sends back an Access Token. The Resource Server receives the Access Token and verifies it. The requested operation is allowed if the token is valid and contains the right scopes.
 
-### Prerequisites
+## Project Structure
 
-- Python 3.x
-- pip
-- Flask
-- PyJWT
+The project is divided into three main parts:
 
+- **Web Frontend:** Contains the user interface and manages the interaction with Google for user login.
+- **Authorization Server:** Handles ID-token verification and Access Token generation.
+- **Resource Server:** Manages Access Token verification and operation authorization.
+
+## Setup and Installation
 ### Installation
 
 Here's a quick step by step guide on how to get the development env running:
@@ -22,7 +30,7 @@ Here's a quick step by step guide on how to get the development env running:
 1. Clone this repository:
 
     ```bash
-    git clone https://github.com/yourusername/flask-jwt-validation.git
+    git clone https://github.com/avega-senso/oauth-ai.git
     ```
 
 2. Install the requirements:
@@ -31,6 +39,36 @@ Here's a quick step by step guide on how to get the development env running:
     cd flask-jwt-validation
     pip install -r requirements.txt
     ```
+
+### Prerequisites
+
+- Python 3.x
+- pip
+- Flask
+- PyJWT
+
+## Usage
+
+(Provide instructions on how to use the application, potentially with screenshots or video walkthroughs.)
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+
+
+# OAuth-AI
+
+This project provides a simple Flask-based service to validate JWT tokens. 
+
+## Getting Started
+
+
+
 
 ### Usage
 
@@ -48,42 +86,7 @@ Here's a quick step by step guide on how to get the development env running:
 
     Replace `"your-jwt-token"` with a real JWT token.
 
-## API
 
-**POST /validate_token**
 
-Validates a JWT token.
 
-- Request:
 
-    ```json
-    {
-        "token": "your-jwt-token"
-    }
-    ```
-
-- Response:
-
-    ```json
-    {
-        "valid": true,
-        "user_id": "user_id_from_decoded_token"
-    }
-    ```
-
-    or
-
-    ```json
-    {
-        "valid": false,
-        "error": "error_message"
-    }
-    ```
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
