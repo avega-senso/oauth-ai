@@ -1,4 +1,4 @@
-GET http://localhost:5000/resource HTTP/1.1
+GET http://localhost:5000/login HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlJvYmVydCBEYWhsYm9yZyIsImlhdCI6MTUxNjIzOTAyMiwic2NvcGVzIjoiZGVzaXJlZC1zY29wZSJ9.xXvOrjUL0Faf_FOZz6RHNsQFRYOhH8i62bGnSGf2jo4
 
