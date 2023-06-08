@@ -1,14 +1,17 @@
-# OAuth2.0 Google Authentication Project
+# OAuthAI - Oauth Authentication Project using ChatGPT 
 
-This project is designed to provide a secure login and authorization process using OAuth 2.0 and OpenID Connect protocols with Google as the identity provider.
+OAuthAI is a comprehensive and secure project built with the primary objective of providing a hands-on, learning platform for individuals looking to delve into the world of OAuth 2.0, OpenID Connect protocols, and Google's authentication system. The project is implemented using the assistance of OpenAI's language model, ChatGPT, showcasing the potential of AI in software development, problem-solving and coding.
 
 ## Table of Contents
 1. [Overview](#overview)
-2. [Project Structure](#project-structure)
-3. [Setup and Installation](#setup-and-installation)
-4. [Usage](#usage)
-5. [Contribute](#contribute)
-6. [License](#license)
+2. [Project Plan](PROJECTPLAN.md)
+3. [Project Structure](#project-structure)
+4. [Architecture](ARCHITECTURE.md)
+5. [Setup and Installation](#setup-and-installation)
+6. [Google IdP Setup](GOOGLE.md)
+7. [Usage](#usage)
+8. [Contribute](#contribute)
+9. [License](#license)
 
 ## Overview
 
@@ -32,11 +35,18 @@ Here's a quick step by step guide on how to get the development env running:
     ```bash
     git clone https://github.com/avega-senso/oauth-ai.git
     ```
-
-2. Install the requirements:
+2. Setup a virtual environment
 
     ```bash
-    cd flask-jwt-validation
+    python3 -m venv env
+    source env/bin/activate
+    pip install -r requirements.txt
+    ```
+
+3. Install the requirements:
+
+    ```bash
+    cd oauth-ai
     pip install -r requirements.txt
     ```
 
