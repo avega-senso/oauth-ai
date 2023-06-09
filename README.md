@@ -7,6 +7,7 @@ OAuthAI is a comprehensive and secure project built with the primary objective o
 2. [Project Plan](PROJECTPLAN.md)
 3. [Project Structure](#project-structure)
 4. [Architecture](ARCHITECTURE.md)
+5. [Key Concepts and Terminology](DEFINITIONS.md)
 5. [Setup and Installation](#setup-and-installation)
 6. [Google IdP Setup](GOOGLE.md)
 7. [Usage](#usage)
