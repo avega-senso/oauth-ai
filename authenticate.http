@@ -1,0 +1,8 @@
+GET http://localhost:5000/resource HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlJvYmVydCBEYWhsYm9yZyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjoxNjg2MzA0MDQwLCJzY29wZXMiOlsiZGVzaXJlZC1zY29wZSJdfQ.B5_0wF33X75KKg-teKUQY0tsSXkk_2w1spuSGfz2GBo
+
+<request>
+    <name>sample</name>
+    <time>Wed, 21 Oct 2015 18:27:50 GMT</time>
+</request>
