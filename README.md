@@ -1,4 +1,4 @@
-# OAuthAI - Oauth Authentication Project using ChatGPT 
+# OAuthAI - OAuth2/OIDC Authentication and Authorization Project using ChatGPT 
 
 OAuthAI is a comprehensive and secure project built with the primary objective of providing a hands-on, learning platform for individuals looking to delve into the world of OAuth 2.0, OpenID Connect protocols, and Google's authentication system. The project is implemented using the assistance of OpenAI's language model, ChatGPT, showcasing the potential of AI in software development, problem-solving and coding.
 
