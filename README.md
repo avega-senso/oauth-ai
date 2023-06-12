@@ -51,12 +51,15 @@ Here's a quick step by step guide on how to get the development env running:
     pip install -r requirements.txt
     ```
 
+4. Start the application:
+
+    ```bash
+    python app.py
+    ```
 ### Prerequisites
 
 - Python 3.x
 - pip
-- Flask
-- PyJWT
 
 ## Usage
 

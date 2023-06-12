@@ -2,32 +2,16 @@
 <html>
     <head>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
-        <script>
-        function auth(googleUser) {
-            // Useful data for your client-side scripts:
-            var profile = googleUser.getBasicProfile();
-            console.log("ID: " + profile.getId()); // Don't send this directly to your server!
-            console.log('Full Name: ' + profile.getName());
-            console.log('Given Name: ' + profile.getGivenName());
-            console.log('Family Name: ' + profile.getFamilyName());
-            console.log("Image URL: " + profile.getImageUrl());
-            console.log("Email: " + profile.getEmail());
-
-            // The ID token you need to pass to your backend:
-            var id_token = googleUser.getAuthResponse().id_token;
-            console.log("ID Token: " + id_token);
-        }
-        </script>
-
-        <title>Home Page</title>
+        <link rel="icon" type="image/svg+xml" href="https://avega.se/wp-content/uploads/2022/04/favicon.svg">
+        <title>OAuthAI</title>
     </head>
     <body>
-        <h1>Welcome to the Home Page!</h1>
+        <h1>OAuthAI - OAuth2/OIDC Authentication and Authorization Project using ChatGPT!</h1>
        <div id="g_id_onload"
             data-client_id="691013142486-m6ig3434oi8ghmavfggn0c9jmk7l4sjn.apps.googleusercontent.com"
+            data-login_uri="http://localhost:5001/callback"
             data-context="signin"
             data-ux_mode="popup"
-            data-callback="auth"
             data-auto_prompt="false">
         </div>
 
