@@ -1,5 +1,8 @@
 from flask import Flask, render_template, make_response, redirect
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
 
 app = Flask(__name__)
 
@@ -50,8 +53,8 @@ def callback():
 
     payload = {
         "code": code,
-        "client_id": client_id,
-        "client_secret": client_secret,
+        "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+        "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
         "redirect_uri": "http://127.0.0.1:5001/callback",
         "grant_type": "authorization_code"
     }
