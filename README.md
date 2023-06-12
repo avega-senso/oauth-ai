@@ -4,12 +4,12 @@ OAuthAI is a comprehensive and secure project built with the primary objective o
 
 ## Table of Contents
 1. [Overview](#overview)
-2. [Project Plan](PROJECTPLAN.md)
+2. [Project Plan](./docs/PROJECTPLAN.md)
 3. [Project Structure](#project-structure)
-4. [Architecture](ARCHITECTURE.md)
-5. [Key Concepts and Terminology](DEFINITIONS.md)
+4. [Architecture](./docs/ARCHITECTURE.md)
+5. [Key Concepts and Terminology](./docs/DEFINITIONS.md)
 5. [Setup and Installation](#setup-and-installation)
-6. [Google IdP Setup](GOOGLE.md)
+6. [Google IdP Setup](./docs/GOOGLE.md)
 7. [Usage](#usage)
 8. [Contribute](#contribute)
 9. [License](#license)
@@ -64,11 +64,11 @@ Here's a quick step by step guide on how to get the development env running:
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
+Please read [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](./docs/LICENSE.md) file for details.
 
 
 

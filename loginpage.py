@@ -1,4 +1,5 @@
 from flask import Flask, render_template, make_response, redirect
+import requests
 
 app = Flask(__name__)
 
@@ -8,6 +9,7 @@ def home():
     response = make_response(render_template('home.html'))
     # Then set a cookie on the response
     response.set_cookie('my_cookie', 'cookie_value', samesite='Lax', secure=False)
+    response.headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     # Then return the response
     return response
 
@@ -15,7 +17,7 @@ def home():
 def login():
     # The redirect URI is often on the same domain as the login route,
     # but it must be a route that your application handles.
-    redirect_uri = "http://127.0.0.1:5000/callback"
+    redirect_uri = "http://127.0.0.1:5001/"
     
     # The authorization URL is the URL you redirect the user to, in order
     # to authenticate with Google.
@@ -37,29 +39,35 @@ def login():
     return redirect(url)
 
 @app.route('/callback', methods=['GET'])
-def protected_resource():
-    auth_header = request.headers.get('Authorization')
+def callback():
+    code = request.args.get('code')
+    if not code:
+        return jsonify({"message": "No authorization code provided."}), 400
 
-    if not auth_header:
-        return jsonify({"message": "No authorization header provided."}), 401
+    token_endpoint = "https://oauth2.googleapis.com/token"
+    client_id = "your-client-id"  # replace with your client ID
+    client_secret = "your-client-secret"  # replace with your client secret
 
-    token = auth_header.split(" ")[1]
+    payload = {
+        "code": code,
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "redirect_uri": "http://127.0.0.1:5001/callback",
+        "grant_type": "authorization_code"
+    }
 
-    try:
-        payload = jwt.decode(token, SECRET, algorithms=["HS256"])
-    except jwt.InvalidTokenError:
-        return jsonify({"message": "Invalid token."}), 401
+    response = requests.post(token_endpoint, data=payload)
+    if response.status_code == 200:
+        token_response = response.json()
+        access_token = token_response.get('access_token')
+        if not access_token:
+            return jsonify({"message": "No access token in token response."}), 401
 
-    # Distinguish between an ID token and an Access Token
-    if 'sub' in payload and 'iat' in payload:
-        # return jsonify({"message": "This is an ID token, not an access token."}), 401
-        return jsonify({"message": "Welcome " + str(payload['name']) + "! You are passing an ID token, not an access token. The ID token is not meant to provide access to resources. it's meant to provide information about the authenticated user to the client. Your id token contains:" + str(payload)}), 401
+        # Now you can use the access token to authorize requests to protected resources
+        return jsonify({"message": "Access granted. Your access token is: " + access_token}), 200
+    else:
+        return jsonify({"message": "Failed to exchange code for token."}), 400
 
-    # Check the scopes in payload['scopes'] to decide whether to allow the operation
-    if 'desired-scope' not in payload['scopes']:
-        return jsonify({"message": "Access denied."}), 403
-
-    return jsonify({"message": "Access granted. Your access token contains:" + str(payload)})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port=5001, debug=True)
