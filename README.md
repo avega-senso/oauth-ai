@@ -39,9 +39,9 @@ Here's a quick step by step guide on how to get the development env running:
 2. Setup a virtual environment
 
     ```bash
+    cd oauth-ai
     python3 -m venv env
     source env/bin/activate
-    pip install -r requirements.txt
     ```
 
 3. Install the requirements:
@@ -100,13 +100,18 @@ This project provides a simple Flask-based service to validate JWT tokens.
     python app.py
     ```
 
-2. Use `curl` to validate a JWT token:
+2. Login using your browser
+
+    - Go to http://localhost:5001
+    - Click "Sign in with Google"
+
+3. Use `curl` to validate your JWT token:
 
     ```bash
-    curl -X POST -H "Content-Type: application/json" -d '{"credential":"<your-jwt-token>"}' http://127.0.0.1:5001/callback
+    curl -X POST -H "Content-Type: application/json" -d '{"credential":"<your-jwt-token>"}' http://localhost:5001/callback
     ```
 
-    Replace `"your-jwt-token"` with a real JWT token.
+    Replace `"your-jwt-token"` with a real JWT token. Note! google.oauth2 library only verifies tokens that are issued by Google's OAuth2 authorization server.
 
 
 
