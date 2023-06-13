@@ -1,6 +1,6 @@
 ## Authorization Testing Instructions
 
-These instructions guide you through the process of testing the authorization system using curl. The process involves making a POST request to the protected endpoint `/token`.
+These instructions guide you through the process of testing the authorization system using curl. The process involves making a POST request to the protected endpoint `/auth`.
 
 ### Prerequisites
 
