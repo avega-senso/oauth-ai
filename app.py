@@ -4,7 +4,7 @@ import os
 import requests
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives import serialization
-from google.oauth2 import id_token
+from google.oauth2 import id_token # google.oauth2 library specifically verifies tokens that are issued by Google's OAuth2 authorization server.
 from google.auth.transport import requests
 
 
@@ -62,9 +62,12 @@ def validate():
             return html
         
             # return jsonify({"message": "Token is valid", "payload": idinfo}), 200
-        except ValueError:
+        except ValueError as e:
             # Invalid token
-            return jsonify({"message": "Invalid token"}), 400
+            return jsonify({
+                "message": "Invalid token",
+                "error": str(e)  # Include the error message from the exception
+            }), 400
             pass
             
     # this will be returned if no valid POST request is received

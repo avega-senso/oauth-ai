@@ -95,7 +95,7 @@ This project provides a simple Flask-based service to validate JWT tokens.
 2. Use `curl` to validate a JWT token:
 
     ```bash
-    curl -X POST -H "Content-Type: application/json" -d '{"token":"your-jwt-token"}' http://127.0.0.1:5000/validate_token
+    curl -X POST -H "Content-Type: application/json" -d '{"credential":"<your-jwt-token>"}' http://127.0.0.1:5001/callback
     ```
 
     Replace `"your-jwt-token"` with a real JWT token.
