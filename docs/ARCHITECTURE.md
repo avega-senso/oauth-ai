@@ -17,6 +17,8 @@ The Resource Server is the component that handles the requests made by the Web F
 
 These components work together to provide a secure login and authorization process for your application using OAuth 2.0 and OpenID Connect protocols with Google as the identity provider.
 
+## Architecture Diagram
+
 ```mermaid
 graph LR
     User[User]
@@ -40,20 +42,26 @@ graph LR
 sequenceDiagram
     participant User
     participant WebFrontend as Web Frontend
-    participant GoogleIdP as Google IdP
-    participant AuthServer as Authorization Server
-    participant ResourceServer as Resource Server
+    participant GoogleIdP as Google IdP (/login)
+    participant AuthServer as Authorization Server (/callback)
+    participant ResourceServer as Resource Server (/resource)
 
-    User->>WebFrontend: Clicks Login
-    WebFrontend->>GoogleIdP: Redirect for login
+    User->>WebFrontend: Clicks "Sign in with Google"
+    WebFrontend->>GoogleIdP: Redirect to Google IdP for login (/login)
     GoogleIdP->>User: Authenticate
     User->>GoogleIdP: Provide Credentials
     GoogleIdP->>WebFrontend: Returns ID-token
-    WebFrontend->>AuthServer: Sends ID-token
+    WebFrontend->>AuthServer: Sends ID-token (/callback)
     AuthServer->>AuthServer: Verifies ID-token with Google's Public Keys
     AuthServer->>WebFrontend: Returns Access Token
-    WebFrontend->>ResourceServer: Sends Access Token
+    WebFrontend->>ResourceServer: Sends Access Token (/resource)
     ResourceServer->>ResourceServer: Decodes Access Token
     ResourceServer->>ResourceServer: Verifies Access Token and Scopes
     ResourceServer-->>WebFrontend: Allows/Denies Request
 ```
+
+### Endpoints
+- The /login endpoint on your frontend that redirects the user to Google's IdP for login
+- The /callback endpoint on your frontend that receives the ID token from Google's IdP
+- The /auth endpoint on your authorization server that verifies the ID token and issues the access token
+- The /resource endpoint on your resource server that requires an access token.

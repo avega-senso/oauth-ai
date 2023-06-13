@@ -25,7 +25,7 @@ def home():
     return response
 
 @app.route('/callback', methods=['GET', 'POST']) # a.k.a /auth, /redirect, or /return
-def validate():
+def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
     if request.method == 'POST':
         token = request.form.get('credential')  # Get the JWT from the form data
 
@@ -47,7 +47,7 @@ def validate():
             payload = idinfo
             picture_url = idinfo.get('picture', '')  # Extract the profile picture URL
             
-                        # Now include the picture_url in your response.
+            # Now include the picture_url in your response.
             # Here's an example of how you could create a simple HTML page displaying the picture.
             html = f"""
             <html>
