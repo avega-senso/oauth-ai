@@ -15,7 +15,7 @@ These instructions guide you through the process of testing the authorization sy
 
 ```bash
 curl -X POST \
-  http://localhost:5000/token \
+  http://localhost:5001/auth \
   -H 'Authorization: Basic Y2xpZW50MTpzZWNyZXQx'
 ```
 
