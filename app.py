@@ -73,11 +73,5 @@ def validate():
     # this will be returned if no valid POST request is received
     return jsonify({"message": "Unexpected request"}), 400
 
-
-
-@app.route('/login-success')
-def login_success():
-    return "Login successful!"
-
 if __name__ == '__main__':
     app.run(host='localhost', port=5001, debug=True)

@@ -51,7 +51,15 @@ Here's a quick step by step guide on how to get the development env running:
     pip install -r requirements.txt
     ```
 
-4. Start the application:
+4. Create an .env file for your cliend_id and client_secret: 
+
+    ```bash
+    # .env file
+    GOOGLE_CLIENT_ID=<client id>
+    GOOGLE_CLIENT_SECRET=<client_secret>
+    ```
+
+5. Start the application:
 
     ```bash
     python app.py
