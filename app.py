@@ -30,25 +30,12 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
         token = request.form.get('credential')  # Get the JWT from the form data
 
         try:
-            # Specify the CLIENT_ID of the app that accesses the backend:
             idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_CLIENT_ID)
-
-            # Or, if multiple clients access the backend server:
-            # idinfo = id_token.verify_oauth2_token(token, requests.Request())
-            # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
-            #     raise ValueError('Could not verify audience.')
-
-            # If auth request is from a G Suite domain:
-            # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
-            #     raise ValueError('Wrong hosted domain.')
-
-            # ID token is valid. Get the user's Google Account ID from the decoded token.
             userid = idinfo['sub']
             payload = idinfo
             picture_url = idinfo.get('picture', '')  # Extract the profile picture URL
             
             # Now include the picture_url in your response.
-            # Here's an example of how you could create a simple HTML page displaying the picture.
             html = f"""
             <html>
             <body>
@@ -56,6 +43,10 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
             <p>UserID: {userid}</p>
             <img src="{picture_url}" alt="Profile Picture">
             <p>Payload: <pre>{json.dumps(idinfo, indent=4)}</pre></p>
+            <!-- Add a button to return to the home page -->
+            <button onclick="location.href='{url_for('home')}'" type="button">
+                Return to home
+            </button>
             </body>
             </html>
             """
