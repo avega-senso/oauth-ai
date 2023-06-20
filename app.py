@@ -42,6 +42,8 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
             <h1>Token is valid</h1>
             <p>UserID: {userid}</p>
             <img src="{picture_url}" alt="Profile Picture">
+            <p>JWT Token: <pre>{token}</pre></p>
+            <p><a href="https://jwt.io/#id_token={token}"><img src="http://jwt.io/img/badge.svg" alt="JWT.io"></a></p>
             <p>Payload: <pre>{json.dumps(idinfo, indent=4)}</pre></p>
             <!-- Add a button to return to the home page -->
             <button onclick="location.href='{url_for('home')}'" type="button">
