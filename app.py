@@ -44,11 +44,58 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
             <img src="{picture_url}" alt="Profile Picture">
             <p>JWT Token: <pre>{token}</pre></p>
             <p><a href="https://jwt.io/#id_token={token}"><img src="http://jwt.io/img/badge.svg" alt="JWT.io"></a></p>
-            <p>Payload: <pre>{json.dumps(idinfo, indent=4)}</pre></p>
-            <!-- Add a button to return to the home page -->
             <button onclick="location.href='{url_for('home')}'" type="button">
                 Return to home
             </button>
+            <p>Payload: <pre>{json.dumps(idinfo, indent=4)}</pre></p>
+            <div>
+                <h3>iss</h3>
+                <p>This stands for issuer. It tells you who issued this token. In this case, the issuer is https://accounts.google.com, which means that the token was issued by Google's authentication server.</p>
+
+                <h3>nbf</h3>
+                <p>This stands for not before. It tells you the time before which the token must not be accepted for processing. The time is represented as the number of seconds since 1970-01-01T0:0:0Z as measured in UTC.</p>
+
+                <h3>aud</h3>
+                <p>This stands for audience. It tells you the ID of the audience that the ID token is intended for. It must match the client ID of your application.</p>
+
+                <h3>sub</h3>
+                <p>This stands for subject. It's an identifier for the user, unique among all Google accounts and never reused.</p>
+
+                <h3>hd</h3>
+                <p>This is the hosted domain parameter. If present, it indicates the hosted domain of the user. This is provided only if the user belongs to a hosted domain.</p>
+
+                <h3>email</h3>
+                <p>This is the email address of the user.</p>
+
+                <h3>email_verified</h3>
+                <p>This tells you whether the email address has been verified as belonging to the user.</p>
+
+                <h3>azp</h3>
+                <p>This stands for authorized party. In certain scenarios, this claim is needed to ensure that the token is intended for the expected recipient.</p>
+
+                <h3>name</h3>
+                <p>This is the full name of the user.</p>
+
+                <h3>picture</h3>
+                <p>This is the URL of the user's profile picture.</p>
+
+                <h3>given_name</h3>
+                <p>This is the given name (first name) of the user.</p>
+
+                <h3>family_name</h3>
+                <p>This is the family name (last name) of the user.</p>
+
+                <h3>iat</h3>
+                <p>This stands for issued at. It tells you when the token was issued. Like nbf, the time is represented as the number of seconds since 1970-01-01T0:0:0Z as measured in UTC.</p>
+
+                <h3>exp</h3>
+                <p>This stands for expiration time. It tells you when the token expires. After this time, the token must not be accepted for processing.</p>
+
+                <h3>jti</h3>
+                <p>This stands for JWT ID. It's a unique identifier for the token, can be used to prevent the JWT from being replayed.</p>
+
+                <p>The values in "sub", "aud", "azp" are specific to your application and the user. The URLs, names, and times will vary based on the specifics of your application and the user who has authenticated.</p>
+            </div>
             </body>
             </html>
             """
