@@ -81,6 +81,7 @@ docker_run.sh
 
 - Python 3.x
 - pip
+- Docker
 
 ## Usage
 
