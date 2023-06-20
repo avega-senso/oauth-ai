@@ -1,10 +1,16 @@
+import requests
 from flask import Flask, request, jsonify
-import jwt
+from jose import jwt
+from jose.exceptions import JWTError
+
 
 app = Flask(__name__)
 
 # Replace this with the correct public key from your Authorization Server
-PUBLIC_KEY = '<public key>'
+# Fetch Google's public keys
+response = requests.get('https://www.googleapis.com/oauth2/v3/certs')
+keys = response.json()
+PUBLIC_KEY = keys.get(header['kid'])
 
 # Used to validate using symmetric keys using HS256 algorithm 
 SECRET = '12345'
