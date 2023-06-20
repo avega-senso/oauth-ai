@@ -7,14 +7,15 @@
     </head>
     <body>
         <h1>OAuthAI - OAuth2/OIDC Authentication and Authorization Project using ChatGPT!</h1>
-       <div id="g_id_onload"
+        <h2>1. Sign in with Google</h2>
+        <p>When a user clicks "Sign in with Google" on a website, it triggers a process known as OAuth 2.0 flow, which allows the user to authenticate and authorize the application to access certain information from their Google account without needing to share their Google username and password with the application.</p>
+        <div id="g_id_onload"
             data-client_id="691013142486-m6ig3434oi8ghmavfggn0c9jmk7l4sjn.apps.googleusercontent.com"
             data-login_uri="http://localhost:5001/callback"
             data-context="signin"
             data-ux_mode="popup"
             data-auto_prompt="false">
         </div>
-
         <div class="g_id_signin"
             data-type="standard"
             data-shape="rectangular"
@@ -24,5 +25,24 @@
             data-logo_alignment="center"
             data-width="100">
         </div>
+        <h2>2. User sees a consent screen</h2>
+        <p>The user is taken to a Google page where they're asked to log in to their Google account (if they're not logged in already) and to grant the application permission to access the information it requested. This page shows the name of the application, what information it's asking for, and the email addresses associated with the user's Google account.</p>
+
+        <h2>3. User grants permission</h2>
+        <p>If the user agrees to grant the application access to the requested information, they click a button to continue.</p>
+
+        <h2>4. Google redirects the user back to the application</h2>
+        <p>Google sends the user back to a specific redirect URL that was set up by the application in advance. The redirect includes an authorization code in the URL.</p>
+
+        <h2>5. Application requests an access token</h2>
+        <p>The application takes the authorization code and sends it to Google's servers in a request that also includes the application's client ID and client secret. Google verifies the authorization code, client ID, and client secret.</p>
+
+        <h2>6. Google sends an access token</h2>
+        <p>If everything checks out, Google sends back an access token (and often a refresh token).</p>
+
+        <h2>7. Application uses the access token</h2>
+        <p>The application can now use the access token to make requests to Google APIs on behalf of the user. For example, it might use the token to get the user's profile information from the Google People API, or to access the user's Google Drive files.</p>
+
+        <p>In your script, after the user clicks "Sign in with Google" and finishes the consent process, Google will redirect the user to the '/callback' endpoint on your server, and the server will validate the ID token that Google provides. If the token is valid, the server will show an HTML page with user information decoded from the ID token. If the token is not valid, the server will send back a JSON message indicating that the token is invalid.</p>
     </body>
 </html>
