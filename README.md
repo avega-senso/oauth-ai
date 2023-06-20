@@ -64,6 +64,19 @@ Here's a quick step by step guide on how to get the development env running:
     ```bash
     python app.py
     ```
+
+6. Build the Docker image
+
+```bash
+docker_build.sh
+```
+
+7. Run the Docker container
+
+```bash
+docker_run.sh
+```
+
 ### Prerequisites
 
 - Python 3.x
