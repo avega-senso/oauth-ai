@@ -5,13 +5,51 @@ import requests
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives import serialization
 from google.oauth2 import id_token # google.oauth2 library specifically verifies tokens that are issued by Google's OAuth2 authorization server.
-from google.auth.transport import requests
+import requests  # This is the common HTTP requests library
+import google.auth.transport.requests as google_requests  # This is an alias to avoid the name collision
 
 
 load_dotenv()  # take environment variables from .env.
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 
 app = Flask(__name__)
+
+
+# @app.route('/oauth/authorize', methods=['GET', 'POST'])
+# @oauth.authorize_handler
+# def authorize(*args, **kwargs):
+#     if request.method == 'GET':
+#         # Render a page for the user to grant access
+#         pass
+#     if request.method == 'POST':
+#         # Read user decision from form data
+#         pass
+#     return True  # Assuming user grants access
+
+
+permissions = {
+   'EMAIL' : ['project1']
+}
+
+@app.route('/oauth/token', methods=['GET'])
+# @oauth.token_handler
+def access_token():
+    idt = request.headers['Authorization']
+    idt = idt.split('Bearer ')[1]
+    try:
+        payload = id_token.verify_oauth2_token(idt, google_requests.Request(), GOOGLE_CLIENT_ID)
+        email = payload['email']
+        user_permissions = permissions[email]
+        return jsonify({"access_token", user_permissions})
+    except ValueError as e:
+        # Invalid token
+        return jsonify({
+            "message": "Invalid token",
+            "error": str(e)  # Include the error message from the exception
+        }), 400
+        pass
+    return None
+
 
 @app.route('/')
 def home():
@@ -28,13 +66,28 @@ def home():
 def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
     if request.method == 'POST':
         token = request.form.get('credential')  # Get the JWT from the form data
-
+#         index = len(token) // 2
+#         bad_token = token[:index] + str(1) + token[index + 1:]
         try:
-            idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_CLIENT_ID)
+            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
             userid = idinfo['sub']
             payload = idinfo
             picture_url = idinfo.get('picture', '')  # Extract the profile picture URL
-            
+
+           # Exchange authorization code for access token (example for authorization_code grant type)
+            token_endpoint = "http://localhost:5001/oauth/token"
+
+            response = requests.get(token_endpoint, headers={'Authorization': 'Bearer ' + token})
+            token_reponse = "none"
+            access_token = "none"
+            if response.status_code == 200:
+                token_response = response.json()
+                access_token = token_response.get('access_token')
+                # Use the access_token as needed
+            else:
+                # Handle error in token response
+                print("Error fetching access token:", response.content)
+
             # Now include the picture_url in your response.
             html = f"""
             <html>
@@ -48,6 +101,8 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
                 Return to home
             </button>
             <p>Payload: <pre>{json.dumps(idinfo, indent=4)}</pre></p>
+
+            <p>Access Token: <pre>{json.dumps(access_token, indent=4)}</pre></p>
             <div>
                 <h3>iss</h3>
                 <p>This stands for issuer. It tells you who issued this token. In this case, the issuer is https://accounts.google.com, which means that the token was issued by Google's authentication server.</p>
