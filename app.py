@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives import serialization
 from google.oauth2 import id_token # google.oauth2 library specifically verifies tokens that are issued by Google's OAuth2 authorization server.
 import requests  # This is the common HTTP requests library
 import google.auth.transport.requests as google_requests  # This is an alias to avoid the name collision
-
+import time
 
 load_dotenv()  # take environment variables from .env.
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
@@ -28,7 +28,7 @@ app = Flask(__name__)
 
 
 permissions = {
-   'EMAIL' : ['project1']
+   'me.2718281828@gmail.com' : 'project1'
 }
 
 @app.route('/oauth/token', methods=['GET'])
@@ -40,14 +40,13 @@ def access_token():
         payload = id_token.verify_oauth2_token(idt, google_requests.Request(), GOOGLE_CLIENT_ID)
         email = payload['email']
         user_permissions = permissions[email]
-        return jsonify({"access_token", user_permissions})
+        return jsonify({"access_token": user_permissions})
     except ValueError as e:
         # Invalid token
         return jsonify({
             "message": "Invalid token",
             "error": str(e)  # Include the error message from the exception
         }), 400
-        pass
     return None
 
 
@@ -69,6 +68,7 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
 #         index = len(token) // 2
 #         bad_token = token[:index] + str(1) + token[index + 1:]
         try:
+            time.sleep(1.01)
             idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
             userid = idinfo['sub']
             payload = idinfo
