@@ -33,7 +33,7 @@ permissions = {
 
 @app.route('/oauth/token', methods=['GET'])
 # @oauth.token_handler
-def access_token():
+def access_token()://add query param for requested permission
     idt = request.headers['Authorization']
     idt = idt.split('Bearer ')[1]
     try:
