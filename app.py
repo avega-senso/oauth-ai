@@ -8,6 +8,9 @@ from google.oauth2 import id_token # google.oauth2 library specifically verifies
 import requests  # This is the common HTTP requests library
 import google.auth.transport.requests as google_requests  # This is an alias to avoid the name collision
 import time
+import jwt
+import datetimefrom jwcrypto import jwe, jwk
+from jwcrypto.common import json_encode, json_decode
 
 load_dotenv()  # take environment variables from .env.
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
@@ -28,28 +31,70 @@ app = Flask(__name__)
 
 
 permissions = {
-   'me.2718281828@gmail.com' : 'project1'
+   'me.2718281828@gmail.com' : 'project1',
+   'robert@dahlborg.com': 'project1',
 }
 
-@app.route('/oauth/token', methods=['GET'])
+
+
+private_key = None
+# Load the private key
+with open("keys/private_key.pem", "rb") as key_file:
+    private_key = serialization.load_pem_private_key(
+        key_file.read(),
+        password=None,  # No password is set for the private key in the previous step
+        backend=default_backend()
+    )
+assert private_key is not None
+
+#TODO
+# create private_key
+
+# get this code to work, signing & encryption
+
+# change to better signing algorithm, non symmetrical
+
+# improve permission DB to include concept of Aud and scopes@app.route('/oauth/token', methods=['GET'])
 # @oauth.token_handler
-def access_token()://add query param for requested permission
+def access_token(): # add query param for requested permission
     idt = request.headers['Authorization']
     idt = idt.split('Bearer ')[1]
     try:
-        payload = id_token.verify_oauth2_token(idt, google_requests.Request(), GOOGLE_CLIENT_ID)
-        email = payload['email']
+        id_payload = id_token.verify_oauth2_token(idt, google_requests.Request(), GOOGLE_CLIENT_ID)
+        email = id_payload['email']
         user_permissions = permissions[email]
-        return jsonify({"access_token": user_permissions})
-    except ValueError as e:
-        # Invalid token
+        # Payload (claims) that will be part of the access token
+        payload = {
+            "sub": email,  # Subject
+            "iss": "Avega",  # Issuer
+            "aud": ["https://project1.avega.se", "https://project2.avega.se"],  # Audience
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),  # Expiration time
+            "scope": ["https://project1.avega.se/customer:read", "https://project1.avega.se/order:readwrite"]  # Custom scope (in this case, your original access token)
+        }
+        signed_encrypted_jwt = create_signed_encrypted_jwt(payload, "SECRET", private_key)jwt
+    except Valusigned_encrypted_jwt        # Invalid token
         return jsonify({
             "message": "Invalid token",
             "error": str(e)  # Include the error message from the exception
         }), 400
     return None
 
+def create_signed_encrypted_jwt(payload, secret_key, private_key):
+    # Sign the JWT
+    token = jwt.encode(payload, secret_key, algorithm="HS256")#Change to better algorithm
 
+    # Generate a public key for JWT encryption
+    public_key = jwk.JWK(**json_decode(private_key))
+
+    # Encrypt the JWT
+    protected_header = {
+        "alg": "RSA-OAEP-256",
+        "enc": "A256GCM"
+    }
+    jwetoken = jwe.JWE(plaintext=token, protected=protected_header)
+    jwetoken.add_recipient(public_key)
+    
+    return jwetoken.serialize()
 @app.route('/')
 def home():
     # First render the template in a response

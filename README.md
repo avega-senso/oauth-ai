@@ -77,6 +77,16 @@ docker_build.sh
 docker_run.sh
 ```
 
+8. Create private/public keys
+
+```bash
+# Generate a private key
+openssl genpkey -algorithm RSA -out private_key.pem
+
+# Extract the public key from the private key
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
+
 ### Prerequisites
 
 - Python 3.x
