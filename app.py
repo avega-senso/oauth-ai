@@ -8,9 +8,11 @@ from google.oauth2 import id_token # google.oauth2 library specifically verifies
 import requests  # This is the common HTTP requests library
 import google.auth.transport.requests as google_requests  # This is an alias to avoid the name collision
 import time
-import jwt
-import datetimefrom jwcrypto import jwe, jwk
+import jwt as pyjwt
+import datetime
+from jwcrypto import jwe, jwk
 from jwcrypto.common import json_encode, json_decode
+from cryptography.hazmat.backends import default_backend
 
 load_dotenv()  # take environment variables from .env.
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
@@ -37,25 +39,20 @@ permissions = {
 
 
 
-private_key = None
-# Load the private key
-with open("keys/private_key.pem", "rb") as key_file:
-    private_key = serialization.load_pem_private_key(
-        key_file.read(),
-        password=None,  # No password is set for the private key in the previous step
-        backend=default_backend()
-    )
-assert private_key is not None
 
-#TODO
-# create private_key
 
-# get this code to work, signing & encryption
+public_key = None
+# Load the public key
+with open("keys/public_key.pem", "rb") as key_file:
+    public_key_pem = key_file.read()
+    public_key = jwk.JWK.from_pem(public_key_pem)
+assert public_key is not None
 
 # change to better signing algorithm, non symmetrical
 
-# improve permission DB to include concept of Aud and scopes@app.route('/oauth/token', methods=['GET'])
+# improve permission DB to include concept of Aud and scopes
 # @oauth.token_handler
+@app.route('/oauth/token', methods=['GET'])
 def access_token(): # add query param for requested permission
     idt = request.headers['Authorization']
     idt = idt.split('Bearer ')[1]
@@ -71,30 +68,86 @@ def access_token(): # add query param for requested permission
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1),  # Expiration time
             "scope": ["https://project1.avega.se/customer:read", "https://project1.avega.se/order:readwrite"]  # Custom scope (in this case, your original access token)
         }
-        signed_encrypted_jwt = create_signed_encrypted_jwt(payload, "SECRET", private_key)jwt
-    except Valusigned_encrypted_jwt        # Invalid token
+        signed_encrypted_jwt = create_signed_encrypted_jwt(payload, "SECRET")
+        print("Signed and encrypted JWT: " + signed_encrypted_jwt)
+    except ValueError as e:        # Invalid token
         return jsonify({
             "message": "Invalid token",
             "error": str(e)  # Include the error message from the exception
         }), 400
-    return None
+    return signed_encrypted_jwt
 
-def create_signed_encrypted_jwt(payload, secret_key, private_key):
+def create_signed_encrypted_jwt(payload, secret_key):
     # Sign the JWT
-    token = jwt.encode(payload, secret_key, algorithm="HS256")#Change to better algorithm
-
-    # Generate a public key for JWT encryption
-    public_key = jwk.JWK(**json_decode(private_key))
+    signed_access_token = pyjwt.encode(payload, secret_key, algorithm="HS256")#Change to better algorithm
 
     # Encrypt the JWT
     protected_header = {
         "alg": "RSA-OAEP-256",
         "enc": "A256GCM"
     }
-    jwetoken = jwe.JWE(plaintext=token, protected=protected_header)
+    jwetoken = jwe.JWE(plaintext=signed_access_token, protected=protected_header)
     jwetoken.add_recipient(public_key)
     
     return jwetoken.serialize()
+
+private_key = None
+# Load the private key
+with open("keys/private_key.pem", "rb") as key_file:
+    private_key = serialization.load_pem_private_key(
+        key_file.read(),
+        password=None,  # No password is set for the private key in the previous step
+        backend=default_backend()
+    )
+assert private_key is not None
+
+@app.route('/resource', methods=['GET'])
+def get_resource():
+    auth_header = request.headers.get('Authorization', None)
+    if not auth_header:
+        return jsonify({'error': 'No Authorization header'}), 401
+
+    parts = auth_header.split()
+
+    if parts[0].lower() != 'bearer':
+        return jsonify({'error': 'Invalid Authorization header format'}), 401
+    if len(parts) == 1:
+        return jsonify({'error': 'Token missing'}), 401
+    elif len(parts) > 2:
+        return jsonify({'error': 'Authorization header must be Bearer token'}), 401
+
+    encrypted_access_token = parts[1]
+    # decrypt token with resource server private key
+
+
+    # Convert the private key to JWK format
+    jwk_key = jwk.JWK.from_pem(private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    ))
+
+    # Deserialize and decrypt the JWE token
+    print("encrypted_access_token", encrypted_access_token)
+    encrypted_token = jwe.JWE()
+    test_token = encrypted_token.deserialize(encrypted_access_token)
+    print("encrypted jwt", test_token)
+    signed_access_token = encrypted_token.decrypt(jwk_key)
+    print("decrypted jwt", signed_access_token)
+    try:
+        # Here we decode and verify the JWT
+        payload = pyjwt.decode(signed_access_token, "SECRET", algorithms=['HS256'])
+    except pyjwt.ExpiredSignatureError:
+        return jsonify({'error': 'Token has expired'}), 401
+    except pyjwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid token'}), 401
+
+    # If JWT is valid, respond with a protected resource
+    return jsonify({
+        'data': 'This is a protected resource',
+        'user': payload['sub']
+    })
+
 @app.route('/')
 def home():
     # First render the template in a response
@@ -123,16 +176,17 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
             token_endpoint = "http://localhost:5001/oauth/token"
 
             response = requests.get(token_endpoint, headers={'Authorization': 'Bearer ' + token})
-            token_reponse = "none"
-            access_token = "none"
+            encrypted_access_token = "none"
             if response.status_code == 200:
-                token_response = response.json()
-                access_token = token_response.get('access_token')
+                encrypted_access_token = response.text
                 # Use the access_token as needed
             else:
                 # Handle error in token response
                 print("Error fetching access token:", response.content)
 
+            # Call resource serverAPI with token
+            resource_endpoint = "http://localhost:5001/resource"
+            requests.get(resource_endpoint, headers={'Authorization': 'Bearer ' + encrypted_access_token})
             # Now include the picture_url in your response.
             html = f"""
             <html>
@@ -147,7 +201,8 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
             </button>
             <p>Payload: <pre>{json.dumps(idinfo, indent=4)}</pre></p>
 
-            <p>Access Token: <pre>{json.dumps(access_token, indent=4)}</pre></p>
+            <p>JWE Token: <pre>{json.dumps(encrypted_access_token, indent=4)}</pre></p>
+
             <div>
                 <h3>iss</h3>
                 <p>This stands for issuer. It tells you who issued this token. In this case, the issuer is https://accounts.google.com, which means that the token was issued by Google's authentication server.</p>
