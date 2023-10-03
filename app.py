@@ -101,7 +101,7 @@ with open("keys/private_key.pem", "rb") as key_file:
     )
 assert private_key is not None
 
-@app.route('/resource', methods=['GET'])
+@app.route('/resource', methods=['GET'])# This service has audience https://project1.avega.se
 def get_resource():
     auth_header = request.headers.get('Authorization', None)
     if not auth_header:
@@ -130,16 +130,19 @@ def get_resource():
     # Deserialize and decrypt the JWE token
     print("encrypted_access_token", encrypted_access_token)
     encrypted_token = jwe.JWE()
-    test_token = encrypted_token.deserialize(encrypted_access_token)
-    print("encrypted jwt", test_token)
-    signed_access_token = encrypted_token.decrypt(jwk_key)
+    encrypted_token.deserialize(encrypted_access_token)
+    encrypted_token.decrypt(jwk_key)
+    signed_access_token = encrypted_token.payload
     print("decrypted jwt", signed_access_token)
     try:
         # Here we decode and verify the JWT
-        payload = pyjwt.decode(signed_access_token, "SECRET", algorithms=['HS256'])
+        payload = pyjwt.decode(signed_access_token, "SECRET", algorithms=['HS256'], audience='https://project1.avega.se')
+        print("decoded jwt", payload)
     except pyjwt.ExpiredSignatureError:
+        print("expired jwt")
         return jsonify({'error': 'Token has expired'}), 401
-    except pyjwt.InvalidTokenError:
+    except pyjwt.InvalidTokenError as e:
+        print("Detailed error:", str(e))
         return jsonify({'error': 'Invalid token'}), 401
 
     # If JWT is valid, respond with a protected resource
@@ -186,7 +189,8 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
 
             # Call resource serverAPI with token
             resource_endpoint = "http://localhost:5001/resource"
-            requests.get(resource_endpoint, headers={'Authorization': 'Bearer ' + encrypted_access_token})
+            response = requests.get(resource_endpoint, headers={'Authorization': 'Bearer ' + encrypted_access_token})
+            resource_data = response.json() if response.status_code == 200 else {"error": "Failed to fetch resource"}
             # Now include the picture_url in your response.
             html = f"""
             <html>
@@ -202,6 +206,8 @@ def validate(): # https://developers.google.com/identity/gsi/web/guides/verify-g
             <p>Payload: <pre>{json.dumps(idinfo, indent=4)}</pre></p>
 
             <p>JWE Token: <pre>{json.dumps(encrypted_access_token, indent=4)}</pre></p>
+
+            <p>Resource Data: <pre>{json.dumps(resource_data, indent=4)}</pre></p>
 
             <div>
                 <h3>iss</h3>
