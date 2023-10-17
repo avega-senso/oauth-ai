@@ -48,12 +48,36 @@ with open("keys/public_key.pem", "rb") as key_file:
     public_key = jwk.JWK.from_pem(public_key_pem)
 assert public_key is not None
 
+
+public_key_auth = None
+# Load the public key
+with open("keys/public_key_auth.pem", "rb") as key_file:
+    public_key_auth_pem = key_file.read()
+    public_key_auth = jwk.JWK.from_pem(public_key_auth_pem)
+assert public_key_auth is not None
+
+
+private_key_auth = None
+# Load the private key
+with open("keys/private_key_auth.pem", "rb") as key_file:
+    private_key_auth = serialization.load_pem_private_key(
+        key_file.read(),
+        password=None,  # No password is set for the private key in the previous step
+        backend=default_backend()
+    )
+assert private_key_auth is not None
+
 # change to better signing algorithm, non symmetrical
 
 # improve permission DB to include concept of Aud and scopes
 # @oauth.token_handler
 @app.route('/oauth/token', methods=['GET'])
 def access_token(): # add query param for requested permission
+    #?scopes=https://project1.avega.se/customer:read,https://project1.avega.se/order:readwrite
+
+    # id X -> [https://project1.avega.se/customer:read, https://project1.avega.se/order:readwrite]
+    # aud https://project1.avega.se -> [https://project1.avega.se/customer:read, https://project1.avega.se/order:readwrite]
+    # aud https://project2.avega.se -> [https://project1.avega.se/customer:read, https://project1.avega.se/order:readwrite]
     idt = request.headers['Authorization']
     idt = idt.split('Bearer ')[1]
     try:
@@ -79,8 +103,7 @@ def access_token(): # add query param for requested permission
 
 def create_signed_encrypted_jwt(payload, secret_key):
     # Sign the JWT
-    signed_access_token = pyjwt.encode(payload, secret_key, algorithm="HS256")#Change to better algorithm
-
+    signed_access_token = pyjwt.encode(payload, private_key_auth, algorithm="RS256")
     # Encrypt the JWT
     protected_header = {
         "alg": "RSA-OAEP-256",
@@ -136,7 +159,7 @@ def get_resource():
     print("decrypted jwt", signed_access_token)
     try:
         # Here we decode and verify the JWT
-        payload = pyjwt.decode(signed_access_token, "SECRET", algorithms=['HS256'], audience='https://project1.avega.se')
+        payload = pyjwt.decode(signed_access_token, public_key_auth, algorithms=['RS256'], audience='https://project1.avega.se')
         print("decoded jwt", payload)
     except pyjwt.ExpiredSignatureError:
         print("expired jwt")
